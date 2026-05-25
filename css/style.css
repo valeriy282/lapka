@@ -156,6 +156,10 @@ section {
   overflow: hidden;
   box-shadow: 0 4px 18px rgba(0,0,0,0.08);
   transition: 0.2s;
+  /* Добавляем Flexbox, чтобы вытянуть карточку по вертикали */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .card:hover {
@@ -170,6 +174,10 @@ section {
 
 .card-body {
   padding: 20px;
+  /* Добавляем Flexbox для тела карточки */
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Заставляет тело занять всё свободное место */
 }
 
 .card h3 {
@@ -279,4 +287,113 @@ footer {
   margin-top: 40px;
   text-align: center;
   opacity: 0.6;
+}
+
+/* =========================================
+   КАТАЛОГ УСЛУГ И ФИЛЬТРЫ
+   ========================================= */
+
+.catalog-page {
+  padding: 60px 0;
+}
+
+/* Панель фильтров */
+.filter-panel {
+  background: white;
+  padding: 25px 30px;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  margin-bottom: 40px;
+}
+
+.filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #1b1b1b;
+  font-size: 14px;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #dce3ea;
+  font-size: 16px;
+  outline: none;
+  transition: 0.2s;
+  background: #f5f8fc;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: #328312;
+  box-shadow: 0 0 0 3px rgba(50, 131, 18, 0.1);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Шапка над результатами */
+.catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #dce3ea;
+  padding-bottom: 15px;
+}
+
+.catalog-header h2 {
+  font-size: 28px;
+  color: #328312;
+}
+
+.catalog-count {
+  background: #e6f4ea;
+  color: #328312;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+/* Плашка с именем врача в карточке */
+.doctor-badge {
+  background: #f5f8fc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-bottom: 10px;
+  border-left: 3px solid #73B713;
+}
+
+.doctor-badge span {
+  font-weight: bold;
+  color: #328312;
+}
+
+/* Пустое состояние, если ничего не найдено */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  font-size: 18px;
+  color: #555;
 }
