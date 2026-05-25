@@ -1,25 +1,39 @@
 <?php
 session_start();
 
-// Если пользователь не авторизован — выгоняем его на страницу входа
+// 1. Подключаем базу данных В САМОМ НАЧАЛЕ
+require_once 'config/db.php';
+
+// 2. Проверяем, авторизован ли пользователь
 if (!isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit;
 }
 
-// 1. Подключаем базу данных (ОБЯЗАТЕЛЬНО)
-require_once 'config/db.php';
+$user_id = $_SESSION['user_id'];
 
-// 2. Получаем актуальные данные пользователя из БД
+// 3. Получаем актуальные данные пользователя из БД
 $stmt = $pdo->prepare('SELECT * FROM users WHERE id = ?');
-$stmt->execute([$_SESSION['user_id']]);
+$stmt->execute([$user_id]);
 $user = $stmt->fetch();
+
+// 4. Получаем историю приемов питомцев пользователя с помощью JOIN
+$history_stmt = $pdo->prepare("
+    SELECT a.id, a.appointment_date, a.status, s.name AS service_name, s.price, d.name AS doctor_name
+    FROM appointments a
+    JOIN services s ON a.service_id = s.id
+    LEFT JOIN doctors d ON a.doctor_id = d.id
+    WHERE a.user_id = ?
+    ORDER BY a.appointment_date DESC
+");
+$history_stmt->execute([$user_id]);
+$appointments = $history_stmt->fetchAll();
 
 // Переменные для вывода сообщений (успех/ошибка)
 $success = '';
 $errors  = [];
 
-// 3. Обработка формы редактирования (UPDATE)
+// 5. Обработка формы редактирования (UPDATE)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
     $name  = trim($_POST['name']  ?? '');
     $phone = trim($_POST['phone'] ?? '');
@@ -106,6 +120,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_profile'])) {
           <label style="display: block; margin-bottom: 8px; font-weight: bold;">Дата регистрации</label>
           <input type="text" value="<?= date('d.m.Y', strtotime($user['created_at'])) ?>" disabled style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; background: #f5f8fc; color: #888; font-size: 16px;">
         </div>
+
+        <div class="cabinet-history" style="margin-top: 5px; background: white; padding: 30px; border-radius: 18px; box-shadow: 0 4px 18px rgba(0,0,0,0.06); margin-bottom: 25px;">
+        <h2 style="font-size: 24px; color: #328312; margin-bottom: 20px; border-bottom: 2px solid #f5f8fc; padding-bottom: 10px;">История посещений клиники</h2>
+
+        <?php if (empty($appointments)): ?>
+            <p style="color: #666; font-style: italic;">У вас пока нет записей на прием. Ваши будущие визиты к ветеринару появятся здесь.</p>
+        <?php else: ?>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background: #f5f8fc; color: #1b1b1b; font-weight: bold;">
+                            <th style="padding: 12px; border-bottom: 2px solid #dce3ea;">Дата и время</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #dce3ea;">Услуга</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #dce3ea;">Врач-ветеринар</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #dce3ea;">Стоимость</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #dce3ea;">Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($appointments as $app): ?>
+                            <tr style="border-bottom: 1px solid #f5f8fc; transition: 0.2s;">
+                                <td style="padding: 12px; font-weight: 500;"><?= date('d.m.Y H:i', strtotime($app['appointment_date'])) ?></td>
+                                <td style="padding: 12px;"><?= htmlspecialchars($app['service_name']) ?></td>
+                                <td style="padding: 12px; color: #555;"><?= htmlspecialchars($app['doctor_name'] ?? 'Не назначен') ?></td>
+                                <td style="padding: 12px; font-weight: bold; color: #73B713;"><?= number_format($app['price'], 0, '.', ' ') ?> ₸</td>
+                                <td style="padding: 12px;">
+                                    <?php 
+                                    $status_style = 'background: #ffeeba; color: #856404;';
+                                    $status_text = 'Ожидается';
+                                    
+                                    if ($app['status'] === 'completed') {
+                                        $status_style = 'background: #e6f4ea; color: #328312;';
+                                        $status_text = 'Завершен';
+                                    } elseif ($app['status'] === 'canceled') {
+                                        $status_style = 'background: #fce8e6; color: #c53929;';
+                                        $status_text = 'Отменен';
+                                    }
+                                    ?>
+                                    <span style="padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; <?= $status_style ?>">
+                                        <?= $status_text ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        <?php endif; ?>
+    </div>
 
         <button type="submit" name="save_profile" class="btn btn-primary" style="width: 100%; font-size: 18px; border: none; cursor: pointer;">
           Сохранить изменения

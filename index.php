@@ -23,7 +23,7 @@ require_once 'config/db.php';
     <div class="hero-content">
       <h1>Добро пожаловать в нашу ветеринарную клинику "Lapka"!</h1>
       <p>Профессиональная забота о здоровье ваших питомцев 24/7</p>
-      <a href="#" class="btn btn-primary">Записаться на приём</a>
+      <a href="catalog.php" class="btn btn-primary">Записаться на приём</a>
     </div>
   </div>
 </section>
@@ -79,7 +79,7 @@ require_once 'config/db.php';
       <h2>Хотите вылечить своего питомца?</h2>
       <p>Записывайтесь на прием и мы подберём лучший курс лечения именно для вашего любимца.</p>
       <br>
-      <a href="#" class="btn btn-primary">Записаться на приём</a>
+      <a href="catalog.php" class="btn btn-primary">Записаться на приём</a>
     </div>
   </div>
 </section>

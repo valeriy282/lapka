@@ -131,7 +131,10 @@ $count    = count($services);
               <div class="price">
                 <?= number_format($s['price'], 0, '.', ' ') ?> ₸
               </div>
-              <a href="#" class="btn btn-outline" style="width: 100%; text-align: center; margin-top: auto;">Записаться</a>
+              <div class="card-actions" style="display: flex; gap: 10px; margin-top: auto;">
+                <a href="detail.php?id=<?= $s['id'] ?>" class="btn btn-outline" style="flex: 1; text-align: center; padding: 10px 5px; font-size: 14px;">Подробнее</a>
+                <a href="book.php?id=<?= $s['id'] ?>" class="btn btn-primary" style="flex: 1; text-align: center; padding: 10px 5px; font-size: 14px;">Записаться</a>
+              </div>
             </div>
           </div>
         <?php endforeach; ?>
